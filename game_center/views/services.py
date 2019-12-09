@@ -8,23 +8,24 @@ from uuid import uuid1
 
 
 from ..services.props import panic, success, error
-from ..models import User
+from ..models import Service
 from .. import db
 
 
-gc_user = Blueprint("user", __name__)
+gc_services = Blueprint("service", __name__)
 
 
-@gc_user.route("/users", methods=["GET"])
+@gc_services.route("/services", methods=["GET"])
 @panic()
 def user():
-    u = User(
-        id=1,
-        uid="asdfasdfadfadfad",
-        username="test"
+    s = Service(
+        name="service",
+        type="wuziqi",
+        url="www.baidu.com",
+        desc = "descrition"
     )
 
-    db.session.add(u)
+    db.session.add(s)
     db.session.commit()
-    data = {"id": "1", "msg": "test"}
+    data = {"data": "{}".format(s)}
     return success(data)

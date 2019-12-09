@@ -17,6 +17,7 @@ db.init_app(app)
 
 # app router
 with app.app_context():
+    print("db url: {}".format(Config.SQLALCHEMY_DATABASE_URI))
     if current_app.config["DEBUG"] == True:
         pretty_logger.setLevel(logging.DEBUG)
     else:
@@ -24,3 +25,6 @@ with app.app_context():
 
     from .views import gc_user
     app.register_blueprint(gc_user, url_prefix="/v1/user")
+
+    from .views import gc_services
+    app.register_blueprint(gc_services, url_prefix="/v1/service")
