@@ -9,4 +9,7 @@ class User(db.Model):
     username = db.Column("username", db.String(255))
     
     def to_dict(self):
-        return {}
+        return {
+            "id": uid,
+            "username": username
+        }

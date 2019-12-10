@@ -1,5 +1,6 @@
 from .helpers import env
 
+
 class Config(object):
     DEBUG = env("DEBUG", cast=bool)
 
@@ -7,4 +8,6 @@ class Config(object):
     # SQLALCHEMY_MAX_OVERFLOW = env("SQLALCHEMY_MAX_OVERFLOW", cast=int)
 
     # database
-    SQLALCHEMY_DATABASE_URI = env("SQLALCHEMY_DATABASE_URI", cast=str)
+    DEBUG = True
+    # env("SQLALCHEMY_DATABASE_URI", cast=str)
+    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:ruc@10.77.70.167:3316/theglovesdev?charset=utf8"

@@ -28,3 +28,6 @@ with app.app_context():
 
     from .views import gc_services
     app.register_blueprint(gc_services, url_prefix="/v1/service")
+
+    from .views import gc_rooms
+    app.register_blueprint(gc_rooms, url_prefix="/v1/room")

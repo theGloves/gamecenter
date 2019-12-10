@@ -5,18 +5,51 @@ from flask import request, g
 from flask import jsonify
 import functools
 import traceback
+from webargs.flaskparser import FlaskParser
+
+
 from pretty_logging import pretty_logger
 
 
-def panic():
+# def panic():
+#     """异常"""
+#     def outter(func):
+#         run_func = func
+
+#         @functools.wraps(func)
+#         def warpper(*args, **kwargs):
+#             try:
+#                 return run_func(*args, **kwargs)
+#             except Exception as e:
+#                 traceback.print_exc()
+#                 return error(reason="{}".format(e))
+#         return warpper
+#     return outter
+
+
+class ValidateException(Exception):
+    pass
+
+
+parser = FlaskParser()
+
+
+def panic(schema=None):
     """异常"""
     def outter(func):
-        run_func = func
+        if schema:
+            @parser.use_args(schema)
+            def run_func(*args, **kwargs):
+                return func(*args, **kwargs)
+        else:
+            run_func = func
 
         @functools.wraps(func)
         def warpper(*args, **kwargs):
             try:
                 return run_func(*args, **kwargs)
+            except ValidateException as e:
+                return error(reason="{}".format(e))
             except Exception as e:
                 traceback.print_exc()
                 return error(reason="{}".format(e))
