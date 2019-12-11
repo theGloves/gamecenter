@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+from pretty_logging import pretty_logger
 
 from . import User
 from ..services.gobang import Gobang
@@ -27,11 +28,15 @@ class Room():
         self.turn = 1
         self.is_gaming = True
 
+    def join_room(self, player):
+        self.participator = player
+
     # 对gobang.is_end的封装
     # 判断棋局是否结束
     # return: (status, msg) - (0, "") - 未结束; (1/2, "normal") - 正常结束，黑棋/白棋获胜; (1,/2 , "timeout") - 对方超时
-
-    def is_finish(self):
+    def is_end(self):
+        if self.game is None:
+            return None
         res = self.game.is_end()
         if res == 0:
             return (0, "")
@@ -47,12 +52,21 @@ class Room():
     def drop(self, x, y, uid):
         player_id = self.__uid2player(uid)
         if player_id == -1 or player_id != self.turn:
+            pretty_logger.error(
+                "player {} not in the game or not your turn".format(uid))
             return
 
+        pretty_logger.debug("{} want to drop: {} {}".format(uid, x, y))
+        if self.game is None or self.is_gaming == False:
+            return
         # 落子
-        self.game.drop_chess(x, y, player_id)
+        res = self.game.drop_chess(x, y, player_id)
+        if res == 0:
+            # 没有落子
+            return
+        self.is_end()
         # 换手
-        self.turn = 1 if player_id == 2 else 1
+        self.turn = 1 if player_id == 2 else 2
         # 重置定时器
 
     def isgaming(self):
@@ -66,7 +80,7 @@ class Room():
     def __uid2player(self, uid):
         if uid == self.creator.uid:
             return 1
-        elif uid == self.participator:
+        elif uid == self.participator.uid:
             return 2
         else:
             return -1

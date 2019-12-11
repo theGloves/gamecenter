@@ -2,6 +2,8 @@
 # author: ljj ruc
 #
 # 五子棋类
+from pretty_logging import pretty_logger
+
 import os
 
 
@@ -154,11 +156,16 @@ class Gobang(object):
         return 0
 
     def drop_chess(self, x, y, id):
+        if x < 0 or x > self.size or y < 0 or y > self.size:
+            return 0
+
         if id == 1 and self.__board[x][y] == 0:
             self.__board[x][y] = 1
+            pretty_logger.debug("{} dropped: {} {}".format(id, x, y))
             return 1
         elif id == 2 and self.__board[x][y] == 0:
             self.__board[x][y] = 2
+            pretty_logger.debug("{} dropped: {} {}".format(id, x, y))
             return 1
         else:
             return 0

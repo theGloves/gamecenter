@@ -10,7 +10,7 @@ from ..services.props import panic, success, error
 from ..services.user import query_user_id
 from ..services.gobang import Gobang
 from ..models import Room
-from ..types import CreateRoomSchema
+from ..types import CreateRoomSchema, JoinGameSchema, DropChessSchema
 from .. import db
 
 
@@ -48,16 +48,63 @@ def room_info(rid):
     return success(data=room.to_dict())
 
 
+# 返回棋局状态
+'''{
+    is_gaming: bool 
+    is_end: bool
+    #如果is_end为True，则有winner&msg
+    winner: 返回获胜方id
+    msg: str获胜原因
+    
+    # 如果is_gaming为True则有chess_board
+    chess_board: [][]int
+}
+'''
 @gc_rooms.route("/<int:rid>/status", methods=["GET"])
 @panic()
 def game_status(rid):
     room = _get_room_by_id(rid)
     if room is None:
         return error(reason="房间不存在")
+    resp = {
+        "is_gaming": room.isgaming(),
+        "is_end": False,
+    }
+
+    res = room.is_end()
+
+    if res is not None and res[0] != 0:
+        resp["is_end"] = True
+        resp["winner"] = room.creator.uid if res[0] == 1 else room.participator.uid
+        resp["msg"] = res[1]
+
+    if room.isgaming() == True:
+        resp["chess_board"] = room.game_status()
+
+    return success(data=resp)
+
+
+@gc_rooms.route("/dropchess", methods=["POST"])
+@panic(DropChessSchema)
+def drop_chess(args):
+    rid = args.get("room_id")
+    uid = args.get("user_id")
+    x = args.get("x")
+    y = args.get("y")
+
+    room = _get_room_by_id(rid)
+    if room is None:
+        return error(reason="房间不存在")
+
+    u = query_user_id(uid)
+    if u is None:
+        return error(reason="用户不存在")
 
     if room.isgaming() == False:
-        return success()
-    return success(data=room.game_status())
+        return error(reason="游戏未开始")
+
+    room.drop(x, y, uid)
+    return success()
 
 
 @gc_rooms.route("/createroom", methods=["POST"])
@@ -102,19 +149,29 @@ def start_game(rid):
 
 
 @gc_rooms.route("/joingame", methods=["POST"])
-@panic()
-def join_game(rid):
+@panic(JoinGameSchema)
+def join_game(args):
+    rid = args.get("room_id")
+    uid = args.get("user_id")
+
     room = _get_room_by_id(rid)
     if room is None:
         return error(reason="房间不存在")
 
-    if room.creator is None or room.participator is None:
-        return error(reason="人数不够")
+    u = query_user_id(uid)
+    if u is None:
+        return error(reason="用户不存在")
+
+    if uid == room.creator.uid:
+        return error(reason="你已在房间中")
+
+    if room.participator is not None:
+        return error(reason="房间已满")
 
     if room.isgaming() == True:
         return error(reason="游戏已开始")
-    game = Gobang()
-    room.start_game(game)
+
+    room.join_room(u)
     return success()
 
 

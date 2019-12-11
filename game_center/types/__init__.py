@@ -1,2 +1,3 @@
 from .services import RegistryServiceSchema, RequestServiceSchema
-from .rooms import CreateRoomSchema
+from .rooms import *
+from .users import RegistryUserSchema
