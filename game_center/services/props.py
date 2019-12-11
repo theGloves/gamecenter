@@ -61,9 +61,8 @@ def success(data: dict = None, msg: str = None):
     s = {
         "code": 200,
         "msg": msg,
+        "data": data if data is not None else None
     }
-    if data:
-        s.update(data)
     return jsonify(s)
 
 

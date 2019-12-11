@@ -10,6 +10,6 @@ class User(db.Model):
     
     def to_dict(self):
         return {
-            "id": uid,
-            "username": username
+            "id": self.uid,
+            "username": self.username
         }
