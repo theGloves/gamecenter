@@ -108,20 +108,14 @@ def drop_chess(args):
 
 
 @gc_rooms.route("/createroom", methods=["POST"])
-@panic(CreateRoomSchema)
-def room_create(args):
+@panic()
+def room_create():
     # 查询用户是否存在
-    uid = args.get("creator_id")
-
-    creator = query_user_id(uid)
-    if creator is None:
-        return error(reason="创建者不存在")
 
     global g_room_id, g_rooms_dict
     g_room_id += 1
     room = Room(
         rid=g_room_id,
-        creator=creator
     )
     g_rooms_dict[g_room_id] = room
 
@@ -158,22 +152,44 @@ def join_game(args):
     if room is None:
         return error(reason="房间不存在")
 
+    if room.isgaming() == True:
+        return error(reason="游戏已开始")
+
     u = query_user_id(uid)
     if u is None:
         return error(reason="用户不存在")
 
-    if uid == room.creator.uid:
+    if room.is_inroom(uid) == True:
         return error(reason="你已在房间中")
 
-    if room.participator is not None:
+    if room.is_full() == True:
         return error(reason="房间已满")
+    room.join_room(u)
+    return success()
+
+
+@gc_rooms.route("/quitgame", methods=["POST"])
+@panic(JoinGameSchema)
+def quit_game(args):
+    rid = args.get("room_id")
+    uid = args.get("user_id")
+
+    room = _get_room_by_id(rid)
+    if room is None:
+        return error(reason="房间不存在")
 
     if room.isgaming() == True:
         return error(reason="游戏已开始")
 
-    room.join_room(u)
-    return success()
+    u = query_user_id(uid)
+    if u is None:
+        return error(reason="用户不存在")
 
+    if room.is_inroom(uid) == False:
+        return error(reason="你不在该房间中")
+
+    room.quit_room(u)
+    return success()
 
 def _get_room_by_id(rid):
     global g_rooms_dict

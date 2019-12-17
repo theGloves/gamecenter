@@ -28,8 +28,33 @@ class Room():
         self.turn = 1
         self.is_gaming = True
 
+    #玩家加入房间，第一个玩家为creator
     def join_room(self, player):
-        self.participator = player
+        if self.creator is None:
+            self.creator = player
+        elif self.participator is None:
+            self.participator = player
+        else:
+            pretty_logger.error("房间已满")
+
+    # 玩家退出房间，如果房主退出则将参与人转为房主
+    def quit_room(self, uid):
+        if self.is_inroom(uid) == False:
+            return False
+        role: int = self.__uid2player(uid)
+        if role == 1:
+            self.creator = self.participator
+            self.participator = None
+        elif role == 2:
+            self.participator = None
+        
+
+    # 房间状态获取，是否已满
+    def is_full(self):
+        return self.creator is not None and self.participator is not None
+
+    def is_inroom(self, uid):
+        return self.__uid2player(uid) != -1
 
     # 对gobang.is_end的封装
     # 判断棋局是否结束
@@ -78,9 +103,9 @@ class Room():
         return []
 
     def __uid2player(self, uid):
-        if uid == self.creator.uid:
+        if self.creator and uid == self.creator.uid:
             return 1
-        elif uid == self.participator.uid:
+        elif self.participator and uid == self.participator.uid:
             return 2
         else:
             return -1
