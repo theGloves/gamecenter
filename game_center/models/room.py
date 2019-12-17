@@ -111,7 +111,7 @@ class Room():
 
     def to_dict(self):
         return {
-            "id": self.room_id,
-            "creator": self.creator.to_dict(),
+            "id": str(self.room_id),
+            "creator": self.creator.to_dict() if self.creator else None, 
             "participarot": self.participator.to_dict() if self.participator is not None else None
         }
