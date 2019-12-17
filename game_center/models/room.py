@@ -19,9 +19,8 @@ class Room():
 
     # 定时器部分，暂时搁置
 
-    def __init__(self, rid, creator):
+    def __init__(self, rid):
         self.room_id = rid
-        self.creator = creator
 
     def start_game(self, gobang):
         self.game = gobang

@@ -188,7 +188,7 @@ def quit_game(args):
     if room.is_inroom(uid) == False:
         return error(reason="你不在该房间中")
 
-    room.quit_room(u)
+    room.quit_room(uid)
     return success()
 
 def _get_room_by_id(rid):
