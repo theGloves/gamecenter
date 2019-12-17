@@ -152,11 +152,7 @@
 ### POST /v1/room/createroom
 创建房间
 #### 入参
-```javascript
-{
-	"creator_id": ""// 创建者的uid，即当前的登录用户
-}
-```
+无
 #### 出参
 ```javascript
 {
@@ -202,7 +198,28 @@
 ```
 
 ### POST /v1/room/joingame
-房主开始游戏
+玩家加入游戏，第一个加入的玩家为房主，执黑棋
+#### 入参
+```javascript
+{
+	"code": 200,
+	"data": {
+	},
+	"msg": null
+}
+```
+#### 出参
+```javascript
+{
+	"code": 200,
+	"data": {
+	},
+	"msg": null
+}
+```
+
+### POST /v1/room/quitgame
+玩家退出房间，如果为房主则房主禅让
 #### 入参
 ```javascript
 {
@@ -223,7 +240,7 @@
 ```
 
 ### POST /v1/room/dropchess
-房主开始游戏
+轮流下棋
 #### 入参
 ```javascript
 {
