@@ -53,7 +53,8 @@ def room_info(rid):
     is_gaming: bool 
     is_end: bool
     #如果is_end为True，则有winner&msg
-    winner: 返回获胜方id
+    turn: -1 1 2
+    winner: 返回1/2 1黑胜 2白胜
     msg: str获胜原因
     
     # 如果is_gaming为True则有chess_board
@@ -69,16 +70,18 @@ def game_status(rid):
     resp = {
         "is_gaming": room.isgaming(),
         "is_end": False,
+        "turn": -1,
     }
 
     res = room.is_end()
 
     if res is not None and res[0] != 0:
         resp["is_end"] = True
-        resp["winner"] = room.creator.uid if res[0] == 1 else room.participator.uid
+        resp["winner"] = res[0]
         resp["msg"] = res[1]
 
     if room.isgaming() == True:
+        resp["turn"] = room.get_turn()
         resp["chess_board"] = room.game_status()
 
     return success(data=resp)
@@ -130,16 +133,17 @@ def start_game(rid):
     room = _get_room_by_id(rid)
     if room is None:
         return error(reason="房间不存在")
-
     # 验证session中的user
     if room.creator is None or room.participator is None:
-        return error(reason="人数不够")
+        # return error(reason="人数不够")
+        return success({"flag": 0})
 
     if room.isgaming() == True:
-        return error(reason="游戏已开始")
+        # return error(reason="游戏已开始")
+        return success({"flag": 1})
     game = Gobang()
     room.start_game(game)
-    return success()
+    return success({"flag": 1})
 
 
 @gc_rooms.route("/joingame", methods=["POST"])
@@ -150,22 +154,27 @@ def join_game(args):
 
     room = _get_room_by_id(rid)
     if room is None:
-        return error(reason="房间不存在")
+        return success({"flag": -1})
+        # return error(reason="房间不存在")
 
     if room.isgaming() == True:
-        return error(reason="游戏已开始")
+        return success({"flag": -1})
+        # return error(reason="游戏已开始")
 
     u = query_user_id(uid)
     if u is None:
-        return error(reason="用户不存在")
+        return success({"flag": -1})
+        # return error(reason="用户不存在")
 
     if room.is_inroom(uid) == True:
-        return error(reason="你已在房间中")
+        return success({"flag": -1})
+        # return error(reason="你已在房间中")
 
     if room.is_full() == True:
-        return error(reason="房间已满")
-    room.join_room(u)
-    return success()
+        return success({"flag": -1}) 
+        # return error(reason="房间已满")
+    flag = room.join_room(u)
+    return success({"flag": flag})
 
 
 @gc_rooms.route("/quitgame", methods=["POST"])

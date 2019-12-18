@@ -1,5 +1,27 @@
 服务器地址: http://<server-url>
-
+## 服务
+### GET /v1/service/services
+获取服务列表
+#### 入参
+无
+####出参
+```javascript
+{
+  "code": 200, 
+  "data": {
+    "data": [
+      {
+        "desc": // 描述, 
+        "id":  // 服务编号, 
+        "name": //服务名
+        "type": // 服务类型
+        "url":  // 服务的url
+      }, 
+	]
+  }
+  "msg": null
+}
+```
 
 ## 用户
 ### POST /v1/user/register

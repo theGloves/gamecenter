@@ -3,11 +3,14 @@ from flask import Flask, current_app
 from flask_sqlalchemy import SQLAlchemy
 from pretty_logging import pretty_logger
 from pretty_logging import logging
+from flask_cors import CORS
 
 from .config import Config
 
 db = SQLAlchemy()
 app = Flask(__name__)
+
+cors = CORS(app, resources={r"/v1/*": {"origins": "*"}})
 
 # config
 app.config.from_object(Config)

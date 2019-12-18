@@ -26,13 +26,13 @@ def registry(args):
         return error(reason="username already used")
 
     u = User(
-        uid=str(uuid1()),
+        uid=username,
         username=username
     )
     db.session.add(u)
     db.session.commit()
     resp = {
-        "uid": u.uid
+        "uid": u.username
     }
     return success(resp)
 

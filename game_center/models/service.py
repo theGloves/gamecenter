@@ -11,4 +11,10 @@ class Service(db.Model):
     desc= db.Column("service_description", db.String(255))
     
     def to_dict(self):
-        return {}
+        return {
+            "id": self.id,
+            "name": self.name,
+            "type": self.type,
+            "url": self.url,
+            "desc": self.desc
+        }

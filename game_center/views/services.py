@@ -18,9 +18,15 @@ gc_services = Blueprint("service", __name__)
 @gc_services.route("/services", methods=["GET"])
 @panic()
 def services_list():
-    s = {"id": 12, "type": "wuziqi"}
-    data = {"data": "{}".format(s)}
-    return success(data)
+    resp={
+        "data": []
+    }
+
+    s_list = Service.query.all()
+    for s in s_list:
+        resp["data"].append(s.to_dict())
+
+    return success(resp)
 
 
 @gc_services.route("/service", methods=["POST"])

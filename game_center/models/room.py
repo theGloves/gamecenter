@@ -31,10 +31,13 @@ class Room():
     def join_room(self, player):
         if self.creator is None:
             self.creator = player
+            return 1
         elif self.participator is None:
             self.participator = player
+            return 2
         else:
             pretty_logger.error("房间已满")
+            return -1
 
     # 玩家退出房间，如果房主退出则将参与人转为房主
     def quit_room(self, uid):
@@ -42,8 +45,7 @@ class Room():
             return False
         role: int = self.__uid2player(uid)
         if role == 1:
-            self.creator = self.participator
-            self.participator = None
+            self.creator = None
         elif role == 2:
             self.participator = None
         
@@ -92,6 +94,9 @@ class Room():
         # 换手
         self.turn = 1 if player_id == 2 else 2
         # 重置定时器
+
+    def get_turn(self):
+        return self.turn
 
     def isgaming(self):
         return self.is_gaming
