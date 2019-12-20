@@ -10,6 +10,8 @@ from .config import Config
 db = SQLAlchemy()
 app = Flask(__name__)
 
+score = {}
+
 cors = CORS(app, resources={r"/v1/*": {"origins": "*"}})
 
 # config
@@ -25,7 +27,12 @@ with app.app_context():
         pretty_logger.setLevel(logging.DEBUG)
     else:
         pretty_logger.setLevel(logging.INFO)
-
+    
+    score["shs_ljj"]=99997
+    score["shs_mmj"]=99995
+    score["shs_mnb"]=99993
+    score["shs_zwk"]=99992
+    
     from .views import gc_user
     app.register_blueprint(gc_user, url_prefix="/v1/user")
 
